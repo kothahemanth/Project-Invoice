@@ -5,17 +5,24 @@ service satinfotech @(requires: 'authenticated-user') {
 
     // Projection on external OData service
     entity BillingInfo as projection on billingapi.A_BillingDocument {
-      BillingDocument,
+        BillingDocument,
         SDDocumentCategory,
         SalesOrganization,
         BillingDocumentDate,
         TotalNetAmount,
         FiscalYear,
-        CompanyCode
+        CompanyCode,
+        
     }
 
     entity BillingItem as projection on billingapi.A_BillingDocumentItem {
-      
+      BillingDocumentItem,
+      BillingDocumentItemText,
+      BaseUnit,
+      BillingQuantityUnit,
+      Plant,
+      StorageLocation,
+      BillingDocument
     }
 
     // Projection on local database schema
