@@ -21,17 +21,6 @@ module.exports = cds.service.impl(async function(){
         try {
             let res = await billingapi.run(req.query);
 
-            // Uncomment and fix the loop to properly handle ProductDescription assignment
-            // res.forEach((element) => {
-            //     if (element.to_Description) {
-            //         element.to_Description.forEach((item) => {
-            //             if (item.Language === 'EN'){
-            //                 element.ProductDescription = item.ProductDescription; 
-            //             }
-            //         });
-            //     }
-            // });
-
             return res;
         } catch (error) {
             console.error('Error during request to remote service:', error);
@@ -54,18 +43,7 @@ module.exports = cds.service.impl(async function(){
 
         try {
             let res = await billingapi.run(req.query);
-
-            // Uncomment and fix the loop to properly handle ProductDescription assignment
-            // res.forEach((element) => {
-            //     if (element.to_Description) {
-            //         element.to_Description.forEach((item) => {
-            //             if (item.Language === 'EN'){
-            //                 element.ProductDescription = item.ProductDescription; 
-            //             }
-            //         });
-            //     }
-            // });
-
+            
             return res;
         } catch (error) {
             console.error('Error during request to remote service:', error);
