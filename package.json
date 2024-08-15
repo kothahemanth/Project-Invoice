@@ -10,6 +10,7 @@
     "@sap-cloud-sdk/http-client": "^3.18.0",
     "@sap-cloud-sdk/resilience": "^3.18.0",
     "@sap/cds": "^7",
+    "@sap/xssec": "^4.2.1",
     "express": "^4",
     "pg": "^8.12.0",
     "postgres": "^3.4.4"

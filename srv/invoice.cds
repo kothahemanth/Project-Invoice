@@ -4,7 +4,19 @@ using {API_BILLING_DOCUMENT_SRV as billingapi} from './external/API_BILLING_DOCU
 service satinfotech @(requires: 'authenticated-user') {
 
     // Projection on external OData service
-    entity BillingInfo as projection on billingapi.A_BillingDocument 
+    entity BillingInfo as projection on billingapi.A_BillingDocument {
+      BillingDocument,
+        SDDocumentCategory,
+        SalesOrganization,
+        BillingDocumentDate,
+        TotalNetAmount,
+        FiscalYear,
+        CompanyCode
+    }
+
+    entity BillingItem as projection on billingapi.A_BillingDocumentItem {
+      
+    }
 
     // Projection on local database schema
     entity Billing as projection on db.Billing;
