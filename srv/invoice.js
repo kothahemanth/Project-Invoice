@@ -65,7 +65,7 @@ module.exports = cds.service.impl(async function () {
                 'BillingDocumentDate', 
                 'FiscalYear', 
                 'CompanyCode'
-            ]).limit(1000));
+            ]));
 
             // Upsert Billing documents into the local database
             billingDocuments = billingDocuments.map(doc => ({
@@ -83,7 +83,7 @@ module.exports = cds.service.impl(async function () {
                 'Plant',
                 'StorageLocation',
                 'BillingDocument'
-            ]).limit(1000));
+            ]));
 
             // Upsert Billing Items into the local database
             billingItems = billingItems.map(item => ({
