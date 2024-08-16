@@ -17,11 +17,12 @@ entity Billing : managed, cuid {
     @title: 'Company Code'
     CompanyCode: String(4);
 
-    item : Composition of many BillingItems on item.BillingDocument_ID = $self;
+    BillingItems : Composition of many BillingItems on BillingItems.BillingDocument_ID = $self;
 }
 
 entity BillingItems : cuid, managed {
 
+    BillingDocument_ID: Association to Billing;
     @title: 'Billing Item'
     BillingDocumentItem: String(6);
     @title: 'Billing Item Text'
@@ -34,8 +35,6 @@ entity BillingItems : cuid, managed {
     Plant: String(4);
     @title: 'Storage Location'
     StorageLocation: String(4);
-
-    BillingDocument_ID : Association to one Billing;
 }
 
 
