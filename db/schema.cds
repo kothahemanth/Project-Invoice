@@ -36,5 +36,3 @@ entity BillingItems : cuid, managed {
     @title: 'Storage Location'
     StorageLocation: String(4);
 }
-
-
