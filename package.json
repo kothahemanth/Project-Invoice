@@ -31,6 +31,14 @@
           "max": 20
         }
       },
+      "auth": {
+        "[production]": {
+          "strategy": "JWT"
+        },
+        "[test]": {
+          "strategy": "mock"
+        }
+      },
       "API_BILLING_DOCUMENT_SRV": {
         "kind": "odata-v2",
         "model": "srv/external/API_BILLING_DOCUMENT_SRV",

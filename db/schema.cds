@@ -3,7 +3,6 @@ namespace com.hemanth.satinfotech;
 using { managed, cuid } from '@sap/cds/common';
 
 entity Billing : managed, cuid {
-
     @title: 'Billing Document'
     key BillingDocument: String(10);
     @title: 'Document Category'
@@ -16,13 +15,13 @@ entity Billing : managed, cuid {
     FiscalYear: String(4);
     @title: 'Company Code'
     CompanyCode: String(4);
-
-    BillingItems : Composition of many BillingItems on BillingItems.BillingDocument_ID = $self;
+    BillingItems : Composition of many BillingItems on BillingItems.BillingDocument= $self.BillingDocument;
 }
 
 entity BillingItems : cuid, managed {
-
-    BillingDocument_ID: Association to Billing;
+    key ID : UUID;
+    @title: 'Billing Document'
+    BillingDocument: String(10);
     @title: 'Billing Item'
     BillingDocumentItem: String(6);
     @title: 'Billing Item Text'
@@ -36,3 +35,5 @@ entity BillingItems : cuid, managed {
     @title: 'Storage Location'
     StorageLocation: String(4);
 }
+
+
