@@ -4,25 +4,19 @@ const { v4: uuidv4 } = require('uuid');
 module.exports = cds.service.impl(async function () {
     const billingapi = await cds.connect.to('API_BILLING_DOCUMENT_SRV');
 
-
     this.on('READ', 'BillingInfo', async req => {
-        
-        // Adjust the query to correctly expand the CompanyCode and include all necessary columns
         req.query.SELECT.columns = [
-            { ref: ['BillingDocument'] },
-            { ref: ['SDDocumentCategory'] },
-            { ref: ['SalesOrganization'] },
-            { ref: ['BillingDocumentDate'] },
-            { ref: ['TotalNetAmount'] },
-            { ref: ['FiscalYear'] },
-            {
-                ref: ['CompanyCode'],
-            }
+            'BillingDocument',
+            'SDDocumentCategory',
+            'SalesOrganization',
+            'BillingDocumentDate',
+            'TotalNetAmount',
+            'FiscalYear',
+            'CompanyCode'
         ];
 
         try {
-            let res = await billingapi.run(req.query);
-
+            const res = await billingapi.run(req.query);
             return res;
         } catch (error) {
             console.error('Error during request to remote service:', error);
@@ -31,63 +25,61 @@ module.exports = cds.service.impl(async function () {
     });
 
     this.on('READ', 'BillingItem', async req => {
-        
-        // Adjust the query to correctly expand the CompanyCode and include all necessary columns
         req.query.SELECT.columns = [
-            { ref: ['BillingDocumentItem'] },
-            { ref: ['BillingDocumentItemText'] },
-            { ref: ['BaseUnit'] },
-            { ref: ['BillingQuantityUnit'] },
-            { ref: ['Plant'] },
-            { ref: ['StorageLocation'] },
-            { ref: ['BillingDocument'] },
+            'BillingDocumentItem',
+            'BillingDocumentItemText',
+            'BaseUnit',
+            'BillingQuantityUnit',
+            'Plant',
+            'StorageLocation'
         ];
 
         try {
-            let res = await billingapi.run(req.query);
-
+            const res = await billingapi.run(req.query);
             return res;
         } catch (error) {
             console.error('Error during request to remote service:', error);
             req.error(502, 'Error during request to remote service');
         }
     });
-    // Fetch and upsert data for Billing and BillingItems entities
+
     this.before('READ', ['Billing', 'BillingItems'], async req => {
         const { Billing, BillingItems } = this.entities;
 
         try {
-            // Fetch Billing documents from the external service
-            let billingDocuments = await billingapi.run(SELECT.from('API_BILLING_DOCUMENT_SRV.A_BillingDocument').columns([
-                'BillingDocument', 
-                'SDDocumentCategory', 
-                'SalesOrganization', 
-                'BillingDocumentDate', 
-                'FiscalYear', 
-                'CompanyCode'
-            ]));
+            let billingDocuments = await billingapi.run(
+                SELECT.from('API_BILLING_DOCUMENT_SRV.A_BillingDocument')
+                .columns([
+                    'BillingDocument', 
+                    'SDDocumentCategory', 
+                    'SalesOrganization', 
+                    'BillingDocumentDate', 
+                    'TotalNetAmount', 
+                    'FiscalYear', 
+                    'CompanyCode'
+                ])
+            );
 
-            // Upsert Billing documents into the local database
             billingDocuments = billingDocuments.map(doc => ({
-                ID: uuidv4(),  // Generate UUID for local storage
+                ID: uuidv4(),
                 ...doc
             }));
             await cds.run(UPSERT.into(Billing).entries(billingDocuments));
 
-            // Fetch Billing Items from the external service
-            let billingItems = await billingapi.run(SELECT.from('API_BILLING_DOCUMENT_SRV.A_BillingDocumentItem').columns([
-                'BillingDocumentItem',
-                'BillingDocumentItemText',
-                'BaseUnit',
-                'BillingQuantityUnit',
-                'Plant',
-                'StorageLocation',
-                'BillingDocument'
-            ]));
+            let billingItems = await billingapi.run(
+                SELECT.from('API_BILLING_DOCUMENT_SRV.A_BillingDocumentItem')
+                .columns([
+                    'BillingDocumentItem',
+                    'BillingDocumentItemText',
+                    'BaseUnit',
+                    'BillingQuantityUnit',
+                    'Plant',
+                    'StorageLocation'
+                ])
+            );
 
-            // Upsert Billing Items into the local database
             billingItems = billingItems.map(item => ({
-                ID: uuidv4(),  // Generate UUID for local storage
+                ID: uuidv4(),
                 ...item
             }));
             await cds.run(UPSERT.into(BillingItems).entries(billingItems));

@@ -21,8 +21,7 @@ service satinfotech @(requires: 'authenticated-user') {
       BaseUnit,
       BillingQuantityUnit,
       Plant,
-      StorageLocation,
-      BillingDocument
+      StorageLocation
     }
 
     // Projection on local database schema
@@ -76,7 +75,7 @@ annotate satinfotech.BillingItems with @(
         { Label: 'Billing Quantity', Value: BillingQuantityUnit },
         { Label: 'Plant', Value: Plant },
         { Label: 'Storage Location', Value: StorageLocation },
-        { Label: 'Billing Document ID', Value: BillingDocument_ID_BillingDocument }
+        // { Label: 'Billing Document ID', Value: BillingDocument_ID_ID}
     ],
     // UI.FieldGroup #BillingItemDetails: {
     //     $Type: 'UI.FieldGroupType',
