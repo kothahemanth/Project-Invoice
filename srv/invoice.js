@@ -31,7 +31,8 @@ module.exports = cds.service.impl(async function () {
             'BaseUnit',
             'BillingQuantityUnit',
             'Plant',
-            'StorageLocation'
+            'StorageLocation',
+            'BillingDocument'
         ];
 
         try {
@@ -74,7 +75,8 @@ module.exports = cds.service.impl(async function () {
                     'BaseUnit',
                     'BillingQuantityUnit',
                     'Plant',
-                    'StorageLocation'
+                    'StorageLocation',
+                    'BillingDocument'
                 ])
             );
 
