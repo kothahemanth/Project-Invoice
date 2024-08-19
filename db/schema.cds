@@ -15,6 +15,8 @@ entity Billing : managed, cuid {
     FiscalYear: String(4);
     @title: 'Company Code'
     CompanyCode: String(4);
+    @title : 'Last Changed Date & Time'
+    LastChangeDateTime:String(40);
     BillingItems : Composition of many BillingItems on BillingItems.BillingDocument= $self.BillingDocument;
 }
 

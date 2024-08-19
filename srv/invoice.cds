@@ -12,6 +12,7 @@ service satinfotech @(requires: 'authenticated-user') {
         TotalNetAmount,
         FiscalYear,
         CompanyCode,
+        LastChangeDateTime
         
     }
 
@@ -41,7 +42,9 @@ annotate satinfotech.Billing with @(
         { Label: 'Sales Organization', Value: SalesOrganization },
         { Label: 'Billing Date', Value: BillingDocumentDate },
         { Label: 'Financial Year', Value: FiscalYear },
-        { Label: 'Company Code', Value: CompanyCode }
+        { Label: 'Company Code', Value: CompanyCode },
+        { Label: 'Last Changed Date Time ', Value: LastChangeDateTime }
+
     ],
     UI.FieldGroup #BillingInformation: {
         $Type: 'UI.FieldGroupType',
@@ -51,7 +54,8 @@ annotate satinfotech.Billing with @(
             { $Type: 'UI.DataField', Value: SalesOrganization },
             { $Type: 'UI.DataField', Value: BillingDocumentDate },
             { $Type: 'UI.DataField', Value: FiscalYear },
-            { $Type: 'UI.DataField', Value: CompanyCode }
+            { $Type: 'UI.DataField', Value: CompanyCode },
+            { $Type: 'UI.DataField', Value: LastChangeDateTime }
         ]
     },
     UI.Facets: [
