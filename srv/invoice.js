@@ -4,7 +4,6 @@ const { v4: uuidv4 } = require('uuid');
 module.exports = cds.service.impl(async function () {
     const billingapi = await cds.connect.to('API_BILLING_DOCUMENT_SRV');
 
-   
     this.on('READ', 'BillingInfo', async req => {
         req.query.SELECT.columns = [
             'BillingDocument',
