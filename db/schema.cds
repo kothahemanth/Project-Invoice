@@ -34,6 +34,10 @@ entity BillingItems : cuid, managed {
     Plant: String(4);
     @title: 'Storage Location'
     StorageLocation: String(4);
+    @title: 'Net Amount'
+    NetAmount: Decimal;
+    @title: 'Transaction Currency'
+    TransactionCurrency: String(5);
 }
 
 

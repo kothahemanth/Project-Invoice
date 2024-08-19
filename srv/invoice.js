@@ -32,7 +32,9 @@ module.exports = cds.service.impl(async function () {
             'BillingQuantityUnit',
             'Plant',
             'StorageLocation',
-            'BillingDocument'
+            'BillingDocument',
+            'NetAmount',
+            'TransactionCurrency'
         ];
 
         try {
@@ -89,7 +91,9 @@ module.exports = cds.service.impl(async function () {
                     'BillingQuantityUnit',
                     'Plant',
                     'StorageLocation',
-                    'BillingDocument'
+                    'BillingDocument',
+                    'NetAmount',
+                    'TransactionCurrency'
                 ])
             );
 

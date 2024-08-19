@@ -22,7 +22,9 @@ service satinfotech @(requires: 'authenticated-user') {
       BillingQuantityUnit,
       Plant,
       StorageLocation,
-      BillingDocument
+      BillingDocument,
+      NetAmount,
+      TransactionCurrency
     }
 
     // Projection on local database schema
@@ -76,6 +78,8 @@ annotate satinfotech.BillingItems with @(
         { Label: 'Billing Quantity', Value: BillingQuantityUnit },
         { Label: 'Plant', Value: Plant },
         { Label: 'Storage Location', Value: StorageLocation },
+        { Label: 'Net Amount', Value: NetAmount },
+        { Label: 'Transaction Currency', Value: TransactionCurrency },
     
     ],
     // UI.FieldGroup #BillingItemDetails: {
