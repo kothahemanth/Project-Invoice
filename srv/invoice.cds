@@ -13,23 +13,24 @@ service satinfotech @(requires: 'authenticated-user') {
         FiscalYear,
         CompanyCode,
         LastChangeDateTime
-        
     }
 
     entity BillingItem as projection on billingapi.A_BillingDocumentItem {
-      BillingDocumentItem,
-      BillingDocumentItemText,
-      BaseUnit,
-      BillingQuantityUnit,
-      Plant,
-      StorageLocation,
-      BillingDocument,
-      NetAmount,
-      TransactionCurrency
+        BillingDocumentItem,
+        BillingDocumentItemText,
+        BaseUnit,
+        BillingQuantityUnit,
+        Plant,
+        StorageLocation,
+        BillingDocument,
+        NetAmount,
+        TransactionCurrency
     }
 
     // Projection on local database schema
-    entity Billing as projection on db.Billing;
+    entity Billing as projection on db.Billing actions {
+        action BillingFetch() returns Boolean;
+    }
 }
 
 // Enable draft support for Billing entity
@@ -43,8 +44,7 @@ annotate satinfotech.Billing with @(
         { Label: 'Billing Date', Value: BillingDocumentDate },
         { Label: 'Financial Year', Value: FiscalYear },
         { Label: 'Company Code', Value: CompanyCode },
-        { Label: 'Last Changed Date Time ', Value: LastChangeDateTime }
-
+        { Label: 'Last Changed Date Time', Value: LastChangeDateTime }
     ],
     UI.FieldGroup #BillingInformation: {
         $Type: 'UI.FieldGroupType',
@@ -69,7 +69,7 @@ annotate satinfotech.Billing with @(
             $Type: 'UI.ReferenceFacet',
             ID: 'BillingItemsFacet',
             Label: 'Billing Items',
-            Target: 'BillingItems/@UI.LineItem'  // Correctly referencing the `item` association
+            Target: 'BillingItems/@UI.LineItem'
         }
     ]
 );
@@ -83,27 +83,27 @@ annotate satinfotech.BillingItems with @(
         { Label: 'Plant', Value: Plant },
         { Label: 'Storage Location', Value: StorageLocation },
         { Label: 'Net Amount', Value: NetAmount },
-        { Label: 'Transaction Currency', Value: TransactionCurrency },
-    
+        { Label: 'Transaction Currency', Value: TransactionCurrency }
     ],
-    // UI.FieldGroup #BillingItemDetails: {
-    //     $Type: 'UI.FieldGroupType',
-    //     Data: [
-    //         { $Type: 'UI.DataField', Value: BillingDocumentItem },
-    //         { $Type: 'UI.DataField', Value: BillingDocumentItemText },
-    //         { $Type: 'UI.DataField', Value: BaseUnit },
-    //         { $Type: 'UI.DataField', Value: BillingQuantityUnit },
-    //         { $Type: 'UI.DataField', Value: Plant },
-    //         { $Type: 'UI.DataField', Value: StorageLocation },
-    //         { $Type: 'UI.DataField', Value: BillingDocument_ID_ID }
-    //     ]
-    // },
-    // UI.Facets: [
-    //     {
-    //         $Type: 'UI.ReferenceFacet',
-    //         ID: 'BillingItemsFacet',
-    //         Label: 'Billing Items',
-    //         Target: '@UI.FieldGroup#BillingItemDetails'  // Correct target reference
-    //     }
-    // ]
+    UI.FieldGroup #BillingItemDetails: {
+        $Type: 'UI.FieldGroupType',
+        Data: [
+            { $Type: 'UI.DataField', Value: BillingDocumentItem },
+            { $Type: 'UI.DataField', Value: BillingDocumentItemText },
+            { $Type: 'UI.DataField', Value: BaseUnit },
+            { $Type: 'UI.DataField', Value: BillingQuantityUnit },
+            { $Type: 'UI.DataField', Value: Plant },
+            { $Type: 'UI.DataField', Value: StorageLocation },
+            { $Type: 'UI.DataField', Value: NetAmount },
+            { $Type: 'UI.DataField', Value: TransactionCurrency }
+        ]
+    },
+    UI.Facets: [
+        {
+            $Type: 'UI.ReferenceFacet',
+            ID: 'BillingItemsFacet',
+            Label: 'Billing Items',
+            Target: '@UI.FieldGroup#BillingItemDetails'
+        }
+    ]
 );

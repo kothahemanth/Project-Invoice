@@ -5,18 +5,18 @@ module.exports = cds.service.impl(async function () {
     const billingapi = await cds.connect.to('API_BILLING_DOCUMENT_SRV');
 
     this.on('READ', 'BillingInfo', async req => {
-        req.query.SELECT.columns = [
-            'BillingDocument',
-            'SDDocumentCategory',
-            'SalesOrganization',
-            'BillingDocumentDate',
-            'TotalNetAmount',
-            'FiscalYear',
-            'CompanyCode',
-            'LastChangeDateTime'
-        ];
-
         try {
+            req.query.SELECT.columns = [
+                'BillingDocument',
+                'SDDocumentCategory',
+                'SalesOrganization',
+                'BillingDocumentDate',
+                'TotalNetAmount',
+                'FiscalYear',
+                'CompanyCode',
+                'LastChangeDateTime'
+            ];
+
             const res = await billingapi.run(req.query);
             return res;
         } catch (error) {
@@ -26,19 +26,19 @@ module.exports = cds.service.impl(async function () {
     });
 
     this.on('READ', 'BillingItem', async req => {
-        req.query.SELECT.columns = [
-            'BillingDocumentItem',
-            'BillingDocumentItemText',
-            'BaseUnit',
-            'BillingQuantityUnit',
-            'Plant',
-            'StorageLocation',
-            'BillingDocument',
-            'NetAmount',
-            'TransactionCurrency'
-        ];
-
         try {
+            req.query.SELECT.columns = [
+                'BillingDocumentItem',
+                'BillingDocumentItemText',
+                'BaseUnit',
+                'BillingQuantityUnit',
+                'Plant',
+                'StorageLocation',
+                'BillingDocument',
+                'NetAmount',
+                'TransactionCurrency'
+            ];
+
             const res = await billingapi.run(req.query);
             return res;
         } catch (error) {
@@ -47,70 +47,110 @@ module.exports = cds.service.impl(async function () {
         }
     });
 
-    
+    this.on('BillingFetch', 'Billing', async req => {
+        try {
+            await cds.tx(async () => {
+                console.log("Executing BillingFetch action");
 
-    // this.before('READ', ['Billing', 'BillingItems'], async req => {
-    //     const { Billing, BillingItems } = this.entities;
+                // Uncomment the following code for the actual fetch logic
 
-    //     try {
-    //         // Fetch existing Billing documents from the local database
-    //         const existingBillingDocs = await cds.run(SELECT.from(Billing).columns(['BillingDocument']));
-    //         const existingBillingItems = await cds.run(SELECT.from(BillingItems).columns(['BillingDocument', 'BillingDocumentItem']));
+                // // Fetch the last synchronization date
+                // const lastsyncdate1 = await cds.run(SELECT.one.from('Billing').columns('LastChangeDateTime').orderBy('LastChangeDateTime desc'));
 
-    //         const existingBillingDocsMap = new Map(existingBillingDocs.map(doc => [doc.BillingDocument, doc]));
-    //         const existingBillingItemsMap = new Map(existingBillingItems.map(item => [`${item.BillingDocument}-${item.BillingDocumentItem}`, item]));
+                // let billlastsyncdatetime;
+                // if (lastsyncdate1) {
+                //     billlastsyncdatetime = lastsyncdate1.LastChangeDateTime;
+                // }
 
-    //         // Fetch new Billing documents from the external service
-    //         let billingDocuments = await billingapi.run(
-    //             SELECT.from('API_BILLING_DOCUMENT_SRV.A_BillingDocument')
-    //             .columns([
-    //                 'BillingDocument', 
-    //                 'SDDocumentCategory', 
-    //                 'SalesOrganization', 
-    //                 'BillingDocumentDate', 
-    //                 'TotalNetAmount', 
-    //                 'FiscalYear', 
-    //                 'CompanyCode'
-    //             ])
-    //         );
+                // // Count and fetch billing documents based on last sync date
+                // let countbilldocs;
+                // let billdocqry = SELECT.from('Billing');
+                // if (billlastsyncdatetime) {
+                //     countbilldocs = await billingapi.send({ method: 'GET', path: `A_BillingDocument/$count?$filter=LastChangeDateTime gt datetimeoffset'${billlastsyncdatetime}'` });
+                //     billdocqry = billdocqry.where({ LastChangeDateTime: { gt: billlastsyncdatetime } });
+                // } else {
+                //     countbilldocs = await billingapi.send({ method: 'GET', path: 'A_BillingDocument/$count' });
+                // }
 
-    //         // Filter out existing Billing documents
-    //         const uniqueBillingDocuments = billingDocuments.filter(doc => !existingBillingDocsMap.has(doc.BillingDocument));
-    //         const billingDocsToUpsert = uniqueBillingDocuments.map(doc => ({ ID: uuidv4(), ...doc }));
+                // // Process in batches of 5000
+                // let batchSize = 5000;
+                // for (let i = 0; i < countbilldocs; i += batchSize) {
+                //     billdocqry = billdocqry.limit(batchSize, i);
+                //     const results = await billingapi.run(billdocqry);
+                //     console.log(`Processing Batch ${i} of ${countbilldocs} records`);
+                //     await cds.run(UPSERT.into('Billing').entries(results));
+                // }
+            });
 
-    //         // Perform the UPSERT operation for Billing documents
-    //         if (billingDocsToUpsert.length > 0) {
-    //             await cds.run(UPSERT.into(Billing).entries(billingDocsToUpsert));
-    //         }
+            return true;
+        } catch (error) {
+            console.error('Error during fetch operation:', error);
+            req.error(500, 'Error during fetch operation');
+        }
+    });
 
-    //         // Fetch new Billing items from the external service
-    //         let billingItems = await billingapi.run(
-    //             SELECT.from('API_BILLING_DOCUMENT_SRV.A_BillingDocumentItem')
-    //             .columns([
-    //                 'BillingDocumentItem',
-    //                 'BillingDocumentItemText',
-    //                 'BaseUnit',
-    //                 'BillingQuantityUnit',
-    //                 'Plant',
-    //                 'StorageLocation',
-    //                 'BillingDocument',
-    //                 'NetAmount',
-    //                 'TransactionCurrency'
-    //             ])
-    //         );
+    this.before('READ', ['Billing', 'BillingItems'], async req => {
+        try {
+            const { Billing, BillingItems } = this.entities;
 
-    //         // Filter out existing Billing items
-    //         const uniqueBillingItems = billingItems.filter(item => !existingBillingItemsMap.has(`${item.BillingDocument}-${item.BillingDocumentItem}`));
-    //         const billingItemsToUpsert = uniqueBillingItems.map(item => ({ ID: uuidv4(), ...item }));
+            // Fetch existing records
+            const existingBillingDocs = await cds.run(SELECT.from(Billing).columns(['BillingDocument']));
+            const existingBillingItems = await cds.run(SELECT.from(BillingItems).columns(['BillingDocument', 'BillingDocumentItem']));
 
-    //         // Perform the UPSERT operation for Billing items
-    //         if (billingItemsToUpsert.length > 0) {
-    //             await cds.run(UPSERT.into(BillingItems).entries(billingItemsToUpsert));
-    //         }
+            const existingBillingDocsMap = new Map(existingBillingDocs.map(doc => [doc.BillingDocument, doc]));
+            const existingBillingItemsMap = new Map(existingBillingItems.map(item => [`${item.BillingDocument}-${item.BillingDocumentItem}`, item]));
 
-    //     } catch (error) {
-    //         console.error("Error while fetching and upserting data:", error);
-    //         throw new Error("Data fetching or upserting failed");
-    //     }
-    // });
+            // Fetch new Billing documents
+            let billingDocuments = await billingapi.run(
+                SELECT.from('API_BILLING_DOCUMENT_SRV.A_BillingDocument')
+                .columns([
+                    'BillingDocument',
+                    'SDDocumentCategory',
+                    'SalesOrganization',
+                    'BillingDocumentDate',
+                    'TotalNetAmount',
+                    'FiscalYear',
+                    'CompanyCode',
+                    'LastChangeDateTime'
+                ])
+            );
+
+            // Filter out existing Billing documents
+            const uniqueBillingDocuments = billingDocuments.filter(doc => !existingBillingDocsMap.has(doc.BillingDocument));
+            const billingDocsToUpsert = uniqueBillingDocuments.map(doc => ({ ID: uuidv4(), ...doc }));
+
+            // UPSERT Billing documents
+            if (billingDocsToUpsert.length > 0) {
+                await cds.run(UPSERT.into(Billing).entries(billingDocsToUpsert));
+            }
+
+            // Fetch new Billing items
+            let billingItems = await billingapi.run(
+                SELECT.from('API_BILLING_DOCUMENT_SRV.A_BillingDocumentItem')
+                .columns([
+                    'BillingDocumentItem',
+                    'BillingDocumentItemText',
+                    'BaseUnit',
+                    'BillingQuantityUnit',
+                    'Plant',
+                    'StorageLocation',
+                    'BillingDocument',
+                    'NetAmount',
+                    'TransactionCurrency'
+                ])
+            );
+
+            // Filter out existing Billing items
+            const uniqueBillingItems = billingItems.filter(item => !existingBillingItemsMap.has(`${item.BillingDocument}-${item.BillingDocumentItem}`));
+            const billingItemsToUpsert = uniqueBillingItems.map(item => ({ ID: uuidv4(), ...item }));
+
+            // UPSERT Billing items
+            if (billingItemsToUpsert.length > 0) {
+                await cds.run(UPSERT.into(BillingItems).entries(billingItemsToUpsert));
+            }
+        } catch (error) {
+            console.error('Error during read operation:', error);
+            req.error(500, 'Error during read operation');
+        }
+    });
 });
