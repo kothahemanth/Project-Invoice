@@ -29,7 +29,10 @@ service satinfotech @(requires: 'authenticated-user') {
     }
 
     // Projection on local database schema
-    entity Billing as projection on db.Billing;
+    entity Billing as projection on db.Billing 
+    
+    action BillingFetch() returns String;
+
 }
 
 // Enable draft support for Billing entity
