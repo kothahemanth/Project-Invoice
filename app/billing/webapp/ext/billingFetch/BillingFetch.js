@@ -61,7 +61,7 @@ sap.ui.define([
             };
 
             const fetchBatch = async (batchNumber, totalRecords) => {
-                const batchMessage = `Processing Batch ${batchNumber} of ${Math.ceil(totalRecords / batchSize)}`;
+                const batchMessage = `Processing Batch ${batchNumber} of ${totalRecords} records...`;
                 this.fetch.getContent()[0].setText(batchMessage); // Update dialog text
 
                 return $.ajax({
@@ -82,11 +82,13 @@ sap.ui.define([
                 const totalBatches = Math.ceil(totalRecords / batchSize); // Calculate total batches
 
                 for (let i = 1; i <= totalBatches; i++) {
-                    await fetchBatch(i, totalRecords);
+                    const currentRecord = (i - 1) * batchSize + 1;
+                    await fetchBatch(currentRecord, totalRecords);
                 }
 
                 // After all batches are processed
                 this.fetch.getContent()[0].setText("All records fetched."); // Update dialog text
+                // this.fetch.getContent()[0].setText(`Total records: ${totalRecords}`);
                 BusyIndicator.hide(); // Hide busy indicator
             };
 
