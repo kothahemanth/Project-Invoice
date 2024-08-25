@@ -6,13 +6,13 @@ sap.ui.define([
 ], function (MessageBox, Dialog, Text, Button) {
     "use strict";
     return {
-        invoice: function (oBindingContext, aSelectedContexts) {
+        fetch: function (oBindingContext, aSelectedContexts) {
             var messageTimeout;
 
             var oStatusText = new Text({ text: "Starting to fetch documents..." });
 
             var oDialog = new Dialog({
-                title: "Processing",
+                title: "Fetching Details",
                 content: [oStatusText],
                 beginButton: new Button({
                     text: "Cancel",
@@ -31,7 +31,7 @@ sap.ui.define([
 
                 if (closeDialog) {
                     oDialog.close();
-                    MessageBox.success("Fetching done");
+                    MessageBox.success("Fetching Successfully");
                 } else {
                     messageTimeout = setTimeout(() => oStatusText.setText(""), 10000);
                 }
@@ -40,6 +40,9 @@ sap.ui.define([
             function handleStatusResponse(statusResponse) {
                 if (statusResponse && typeof statusResponse === 'object' && statusResponse.value) {
                     const messages = statusResponse.value.messages || [];
+                    const totalRecords = statusResponse.value.totalRecords || 0; // Assuming `totalRecords` is part of the response
+                    updateStatus(`Total Records: ${totalRecords}`);
+
                     messages.forEach((msg, i) => {
                         setTimeout(() => {
                             if (msg === "BillingFetch completed successfully") {

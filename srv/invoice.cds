@@ -32,6 +32,7 @@ service satinfotech @(requires: 'authenticated-user') {
     entity Billing as projection on db.Billing 
     
     action BillingFetch() returns String;
+    action BillingFetchStatus() returns String;
 
 }
 
@@ -89,24 +90,25 @@ annotate satinfotech.BillingItems with @(
         { Label: 'Transaction Currency', Value: TransactionCurrency },
     
     ],
-    // UI.FieldGroup #BillingItemDetails: {
-    //     $Type: 'UI.FieldGroupType',
-    //     Data: [
-    //         { $Type: 'UI.DataField', Value: BillingDocumentItem },
-    //         { $Type: 'UI.DataField', Value: BillingDocumentItemText },
-    //         { $Type: 'UI.DataField', Value: BaseUnit },
-    //         { $Type: 'UI.DataField', Value: BillingQuantityUnit },
-    //         { $Type: 'UI.DataField', Value: Plant },
-    //         { $Type: 'UI.DataField', Value: StorageLocation },
-    //         { $Type: 'UI.DataField', Value: BillingDocument_ID_ID }
-    //     ]
-    // },
-    // UI.Facets: [
-    //     {
-    //         $Type: 'UI.ReferenceFacet',
-    //         ID: 'BillingItemsFacet',
-    //         Label: 'Billing Items',
-    //         Target: '@UI.FieldGroup#BillingItemDetails'  // Correct target reference
-    //     }
-    // ]
+    UI.FieldGroup #BillingItemDetails: {
+        $Type: 'UI.FieldGroupType',
+        Data: [
+            { $Type: 'UI.DataField', Value: BillingDocumentItem },
+            { $Type: 'UI.DataField', Value: BillingDocumentItemText },
+            { $Type: 'UI.DataField', Value: BaseUnit },
+            { $Type: 'UI.DataField', Value: BillingQuantityUnit },
+            { $Type: 'UI.DataField', Value: Plant },
+            { $Type: 'UI.DataField', Value: StorageLocation },
+            { Label: 'Net Amount', Value: NetAmount },
+            { Label: 'Transaction Currency', Value: TransactionCurrency },
+        ]
+    },
+    UI.Facets: [
+        {
+            $Type: 'UI.ReferenceFacet',
+            ID: 'BillingItemsFacet',
+            Label: 'Billing Items',
+            Target: '@UI.FieldGroup#BillingItemDetails'  // Correct target reference
+        }
+    ]
 );
