@@ -4,12 +4,18 @@ const { v4: uuidv4 } = require("uuid");
 module.exports = cds.service.impl(async function () {
   const billingapi = await cds.connect.to("API_BILLING_DOCUMENT_SRV");
 
+  // Status object to keep track of the process
+  let fetchStatus = {
+    messages: ["Initializing..."],  // Array to keep track of status messages
+    completed: false
+  };
+
   // Function to handle the data fetching and upserting logic
   async function fetchAndUpsertBillingData() {
     try {
       const { Billing, BillingItems } = this.entities;
 
-      // Fetch existing records (move this before batch processing starts)
+      // Fetch existing records
       const existingBillingDocs = await cds.run(
         SELECT.from(Billing).columns(["BillingDocument"])
       );
@@ -63,29 +69,40 @@ module.exports = cds.service.impl(async function () {
       } else {
         countbilldocs = await billingapi.send({ method: "GET", path: "A_BillingDocument/$count" });
       }
-      console.log(countbilldocs)
 
-      // Process in batches of 5000
+      // Process in batches of 50
       let batchSize = 50;
-      for (let i = 0; i < countbilldocs; i += batchSize) {
-        let billingDocuments = await billingapi.run(billdocqry.limit(batchSize, i));
-        
-        console.log(`Processing Batch ${i + 1} of ${countbilldocs} records`);
+let count = 1;
 
-        // Filter out existing Billing documents
-        const uniqueBillingDocuments = billingDocuments.filter(
-          (doc) => !existingBillingDocsMap.has(doc.BillingDocument)
-        );
-        const billingDocsToUpsert = uniqueBillingDocuments.map((doc) => ({
-          ID: uuidv4(),
-          ...doc,
-        }));
+for (let i = 0; i < countbilldocs; i += batchSize) {
+    // Determine the upper limit of the current batch
+    let upperLimit = i + batchSize;
+    if (upperLimit > countbilldocs) {
+        upperLimit = countbilldocs;  // Adjust if the upper limit exceeds the total count
+    }
 
-        // UPSERT Billing documents
-        if (billingDocsToUpsert.length > 0) {
-          await cds.run(UPSERT.into(Billing).entries(billingDocsToUpsert));
-        }
-      }
+    let billingDocuments = await billingapi.run(billdocqry.limit(batchSize, i));
+
+    // Push a message indicating the current batch range being processed
+    fetchStatus.messages.push(`Processing Batch ${count} ( ${i + 1} to ${upperLimit} ) of ${countbilldocs} records`);
+    count += 1;
+    console.log(fetchStatus.messages[fetchStatus.messages.length - 1]);
+
+    // Filter out existing Billing documents
+    const uniqueBillingDocuments = billingDocuments.filter(
+        (doc) => !existingBillingDocsMap.has(doc.BillingDocument)
+    );
+    const billingDocsToUpsert = uniqueBillingDocuments.map((doc) => ({
+        ID: uuidv4(),
+        ...doc,
+    }));
+
+    // UPSERT Billing documents
+    if (billingDocsToUpsert.length > 0) {
+        await cds.run(UPSERT.into(Billing).entries(billingDocsToUpsert));
+    }
+}
+
 
       // Fetch new Billing items
       let billingItems = await billingapi.run(
@@ -116,10 +133,16 @@ module.exports = cds.service.impl(async function () {
 
       // UPSERT Billing items
       if (billingItemsToUpsert.length > 0) {
-        return await cds.run(UPSERT.into(BillingItems).entries(billingItemsToUpsert));
+        await cds.run(UPSERT.into(BillingItems).entries(billingItemsToUpsert));
       }
+
+      // Update status upon completion
+      fetchStatus.messages.push("BillingFetch completed successfully");
+      fetchStatus.completed = true;
     } catch (error) {
       console.error("Error during read operation:", error);
+      fetchStatus.messages.push("Error during BillingFetch operation");
+      fetchStatus.completed = true;
       throw error;  // Rethrow to be caught by the calling function
     }
   }
@@ -127,12 +150,22 @@ module.exports = cds.service.impl(async function () {
   // Register the BillingFetch handler
   this.on("BillingFetch", async (req) => {
     try {
+      fetchStatus = { messages: ["Initializing..."], completed: false }; // Reset status
       await fetchAndUpsertBillingData.call(this);
-      console.log("BillingFetch completed successfully");
+      //console.log("BillingFetch completed successfully");
+      console.log("fetch status",fetchStatus);
       return true;
     } catch (error) {
       console.error("Error during BillingFetch operation:", error);
       req.error(500, "Error during BillingFetch operation");
     }
   });
+
+  // Register the BillingFetchStatus handler
+  this.on("BillingFetchStatus", async (req) => {
+    console.log(fetchStatus);
+    return fetchStatus;
+  });
+
+  // Other event handlers...
 });
