@@ -20,6 +20,12 @@ sap.ui.define([
                         oDialog.close();
                         clearTimeout(messageTimeout);
                     }
+                }),
+                endButton: new Button({ // Adding the OK button here
+                    text: "OK",
+                    press: function () {
+                        oDialog.close();
+                    }
                 })
             });
 
