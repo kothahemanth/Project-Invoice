@@ -9,7 +9,7 @@ sap.ui.define([
         fetch: function (oBindingContext, aSelectedContexts) {
             var messageTimeout;
 
-            var oStatusText = new Text({ text: " Starting to Fetch Billing Docs... " });
+            var oStatusText = new Text({ text: "Starting to Fetch Billing Docs..." });
 
             var oDialog = new Dialog({
                 title: "Fetching Details",
@@ -21,10 +21,11 @@ sap.ui.define([
                         clearTimeout(messageTimeout);
                     }
                 }),
-                endButton: new Button({ // Adding the OK button here
+                endButton: new Button({
                     text: "OK",
                     press: function () {
                         oDialog.close();
+                        location.reload(); // Reload the page when the dialog is closed
                     }
                 })
             });
@@ -36,8 +37,12 @@ sap.ui.define([
                 if (messageTimeout) clearTimeout(messageTimeout);
 
                 if (closeDialog) {
-                    oDialog.close();
-                    MessageBox.success("Fetching Successfully");
+                    if (message === "BillingFetch completed successfully") {
+                        oDialog.getEndButton().firePress(); // Programmatically click the "OK" button
+                    } else {
+                        oDialog.close();
+                        MessageBox.success("Fetching Successfully");
+                    }
                 } else {
                     messageTimeout = setTimeout(() => oStatusText.setText(""), 10000);
                 }
@@ -46,7 +51,7 @@ sap.ui.define([
             function handleStatusResponse(statusResponse) {
                 if (statusResponse && typeof statusResponse === 'object' && statusResponse.value) {
                     const messages = statusResponse.value.messages || [];
-                    const totalRecords = statusResponse.value.totalRecords || 0; // Assuming `totalRecords` is part of the response
+                    const totalRecords = statusResponse.value.totalRecords || 0;
                     updateStatus(`Total Records: ${totalRecords}`);
 
                     messages.forEach((msg, i) => {
