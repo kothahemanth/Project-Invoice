@@ -6,7 +6,7 @@ module.exports = cds.service.impl(async function () {
 
   // Status object to keep track of the process
   let fetchStatus = {
-    messages: ["Initializing..."],  // Array to keep track of status messages
+    messages: [" Initializing... "],  // Array to keep track of status messages
     completed: false
   };
 
@@ -137,7 +137,7 @@ for (let i = 0; i < countbilldocs; i += batchSize) {
       }
 
       // Update status upon completion
-      fetchStatus.messages.push("BillingFetch completed successfully");
+      fetchStatus.messages.push("BillingFetching completed successfully");
       fetchStatus.completed = true;
     } catch (error) {
       console.error("Error during read operation:", error);
@@ -152,8 +152,7 @@ for (let i = 0; i < countbilldocs; i += batchSize) {
     try {
       fetchStatus = { messages: ["Initializing..."], completed: false }; // Reset status
       await fetchAndUpsertBillingData.call(this);
-      //console.log("BillingFetch completed successfully");
-      console.log("fetch status",fetchStatus);
+      console.log("Fetch Status",fetchStatus);
       return true;
     } catch (error) {
       console.error("Error during BillingFetch operation:", error);
@@ -167,5 +166,4 @@ for (let i = 0; i < countbilldocs; i += batchSize) {
     return fetchStatus;
   });
 
-  // Other event handlers...
 });

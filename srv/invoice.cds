@@ -32,7 +32,7 @@ service satinfotech @(requires: 'authenticated-user') {
     entity Billing as projection on db.Billing 
     
     action BillingFetch() returns String;
-    action BillingFetchStatus() returns String;
+    action Status() returns String;
 
 }
 

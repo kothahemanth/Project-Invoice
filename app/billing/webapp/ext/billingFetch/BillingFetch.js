@@ -9,7 +9,7 @@ sap.ui.define([
         fetch: function (oBindingContext, aSelectedContexts) {
             var messageTimeout;
 
-            var oStatusText = new Text({ text: "Starting to fetch documents..." });
+            var oStatusText = new Text({ text: " Starting to Fetch Billing Docs... " });
 
             var oDialog = new Dialog({
                 title: "Fetching Details",
@@ -65,7 +65,7 @@ sap.ui.define([
                     // Poll only once after 5 seconds
                     setTimeout(() => {
                         $.ajax({
-                            url: "/odata/v4/satinfotech/BillingFetchStatus",
+                            url: "/odata/v4/satinfotech/Status",
                             type: "POST",
                             contentType: "application/json",
                             success: handleStatusResponse,
