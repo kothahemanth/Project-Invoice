@@ -161,7 +161,7 @@ for (let i = 0; i < countbilldocs; i += batchSize) {
   });
 
   // Register the BillingFetchStatus handler
-  this.on("BillingFetchStatus", async (req) => {
+  this.on("Status", async (req) => {
     console.log(fetchStatus);
     return fetchStatus;
   });
